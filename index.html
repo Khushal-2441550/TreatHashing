@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThreatHash — Execution of Hash Algorithm in Hash Table</title>
+    <style>
+        :root {
+            --bg-main: #F4F4F5;
+            --card-bg: #FFFFFF;
+            --border-color: #E4E4E7;
+            --text-dark: #18181B;
+            --text-muted: #71717A;
+            --accent-primary: #18181B;
+            --accent-highlight: #2563EB;
+            --font-mono: 'Consolas', 'Courier New', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            padding: 24px;
+            max-width: 1360px;
+            margin: 0 auto;
+        }
+
+        /* Clean Minimal Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px solid #D4D4D8;
+            padding-bottom: 14px;
+            margin-bottom: 24px;
+        }
+
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .header-sub {
+            font-size: 1.0rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .metric-num {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-family: var(--font-mono);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 24px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .ip-input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 1rem;
+            font-family: var(--font-mono);
+            border: 1px solid #A1A1AA;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        .ip-input:focus {
+            border-color: var(--text-dark);
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: #FFFFFF;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #27272A;
+        }
+
+        .btn-sec {
+            background: #E4E4E7;
+            color: var(--text-dark);
+            border: 1px solid #D4D4D8;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-sec:hover {
+            background: #D4D4D8;
+        }
+
+        .preset-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            align-items: center;
+        }
+
+        .preset-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .btn-preset {
+            background: #F4F4F5;
+            border: 1px solid #D4D4D8;
+            color: var(--text-dark);
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-preset:hover {
+            background: #E4E4E7;
+        }
+
+        /* 2-Column Layout */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1.15fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .panel-header {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            border-bottom: 2px solid var(--bg-main);
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Step Log Cards */
+        .step-card {
+            border-left: 4px solid #D4D4D8;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            background: #FAFAFA;
+            border-radius: 0 6px 6px 0;
+            transition: all 0.2s;
+        }
+
+        .step-card.active {
+            border-left-color: var(--accent-highlight);
+            background: #EFF6FF;
+        }
+
+        .step-lbl {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--accent-highlight);
+            text-transform: uppercase;
+        }
+
+        .step-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 2px 0;
+        }
+
+        .step-desc {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Canvas Output Blocks */
+        .canvas-block {
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px;
+            margin-bottom: 12px;
+            opacity: 0.4;
+            transition: all 0.3s;
+        }
+
+        .canvas-block.active {
+            opacity: 1;
+            border-color: #A1A1AA;
+            background: var(--card-bg);
+        }
+
+        .canvas-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .mono-output {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Bucket Grid */
+        .bucket-grid {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 8px;
+            background: #F4F4F5;
+            border-radius: 4px;
+        }
+
+        .bucket-slot {
+            min-width: 80px;
+            background: var(--card-bg);
+            border: 1px solid #D4D4D8;
+            border-radius: 4px;
+            padding: 6px;
+            text-align: center;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+        }
+
+        .bucket-slot.target {
+            border: 2px solid var(--accent-highlight);
+            background: #EFF6FF;
+            color: var(--accent-highlight);
+            font-weight: 700;
+        }
+
+        /* Node Memory Block */
+        .node-diagram {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+        }
+
+        .node-box {
+            display: flex;
+            border: 1.5px solid #2563EB;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--card-bg);
+        }
+
+        .node-data {
+            padding: 6px 10px;
+            background: #EFF6FF;
+            color: #1E40AF;
+            border-right: 1px solid #BFDBFE;
+            font-weight: 700;
+        }
+
+        .node-ptr {
+            padding: 6px 8px;
+            color: var(--text-muted);
+        }
+
+        .ptr-arrow {
+            color: var(--accent-highlight);
+            font-weight: bold;
+        }
+
+        /* Results & Benchmarks */
+        .result-box {
+            padding: 12px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .result-box.malicious {
+            background: #FEE2E2;
+            border: 1px solid #FCA5A5;
+            color: #991B1B;
+        }
+
+        .result-box.clean {
+            background: #DCFCE7;
+            border: 1px solid #86EFAC;
+            color: #166534;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        th {
+            background: #FAFAFA;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-title">ThreatHash</div>
+        <div class="header-sub">Execution of Hash Algorithm in Hash Table</div>
+    </header>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-num">10,000</div>
+            <div class="metric-label">Total IPs Loaded</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-num">10,007</div>
+            <div class="metric-label">Hash Table Size (M)</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-num">1,247</div>
+            <div class="metric-label">Total Collisions</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-num">0.66</div>
+            <div class="metric-label">Load Factor (α)</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-num">3</div>
+            <div class="metric-label">Max Chain Depth</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="control-panel">
+        <div class="input-row">
+            <input type="text" class="ip-input" id="ipInput" value="185.220.101.25" placeholder="Enter IPv4 Address">
+            <button class="btn-primary" onclick="startExecution()">EXECUTE LOOKUP</button>
+            <button class="btn-sec" onclick="togglePause()" id="btnPause">PAUSE</button>
+            <button class="btn-sec" onclick="resetState()">RESET</button>
+        </div>
+        <div class="preset-row">
+            <span class="preset-label">Preset IPs:</span>
+            <button class="btn-preset" onclick="selectPreset('185.220.101.25')">185.220.101.25 (Botnet)</button>
+            <button class="btn-preset" onclick="selectPreset('45.33.32.156')">45.33.32.156 (Scanner)</button>
+            <button class="btn-preset" onclick="selectPreset('103.21.244.0')">103.21.244.0 (Phishing)</button>
+            <button class="btn-preset" onclick="selectPreset('192.168.1.10')">192.168.1.10 (Internal)</button>
+            <button class="btn-preset" onclick="selectPreset('8.8.8.8')">8.8.8.8 (Clean IP)</button>
+        </div>
+    </div>
+
+    <!-- 2-Column Workspace -->
+    <div class="workspace">
+
+        <!-- LEFT: LOG -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>Algorithm Step Log</span>
+                <span id="stepCounter" style="color:var(--accent-highlight)">STEP 0/5</span>
+            </div>
+
+            <div class="step-card" id="log-1">
+                <div class="step-lbl">Step 1</div>
+                <div class="step-title">IPv4 Validation & Octet Parsing</div>
+                <div class="step-desc">Validates IPv4 format (A.B.C.D) and parses 4 independent octets.</div>
+            </div>
+
+            <div class="step-card" id="log-2">
+                <div class="step-lbl">Step 2</div>
+                <div class="step-title">32-Bit Positional Integer Mapping</div>
+                <div class="step-desc">Converts octets into integer: (A × 256³) + (B × 256²) + (C × 256) + D.</div>
+            </div>
+
+            <div class="step-card" id="log-3">
+                <div class="step-lbl">Step 3</div>
+                <div class="step-title">Multiplicative Hash & Modulo Index</div>
+                <div class="step-desc">Multiplies integer by Golden Ratio Prime (2654435761) mod table capacity M=10007.
+                </div>
+            </div>
+
+            <div class="step-card" id="log-4">
+                <div class="step-lbl">Step 4</div>
+                <div class="step-title">Hash Table Bucket & Node Traversal</div>
+                <div class="step-desc">Accesses Table[Index] in O(1) time and traverses linked list node chain.</div>
+            </div>
+
+            <div class="step-card" id="log-5">
+                <div class="step-lbl">Step 5</div>
+                <div class="step-title">Result Evaluation & Performance Contrast</div>
+                <div class="step-desc">Evaluates status and compares Hash Table search (O(1)) vs Linear Search (O(n)).
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: VISUAL CANVAS -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>Visual Memory Canvas</span>
+                <span id="stageLabel" style="color:var(--text-muted)">IDLE</span>
+            </div>
+
+            <div class="canvas-block" id="block-1">
+                <div class="canvas-label">Octet Breakdown</div>
+                <div class="mono-output" id="disp-octets">Octets: -- . -- . -- . --</div>
+            </div>
+
+            <div class="canvas-block" id="block-2">
+                <div class="canvas-label">32-Bit Integer Computation</div>
+                <div class="mono-output" id="disp-int">Integer = --</div>
+            </div>
+
+            <div class="canvas-block" id="block-3">
+                <div class="canvas-label">Hash Index Calculation</div>
+                <div class="mono-output" id="disp-hash">Bucket Index = --</div>
+            </div>
+
+            <div class="canvas-block" id="block-4">
+                <div class="canvas-label">Hash Table Bucket & Linked List Node</div>
+                <div class="bucket-grid" id="disp-buckets">
+                    <div class="bucket-slot">Index #0</div>
+                    <div class="bucket-slot">...</div>
+                    <div class="bucket-slot">Index #M-1</div>
+                </div>
+                <div class="node-diagram" id="disp-nodes">
+                    <!-- Dynamic Node -->
+                </div>
+            </div>
+
+            <div class="canvas-block" id="block-5">
+                <div class="canvas-label">DAA Evaluation Summary</div>
+                <div id="disp-result"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const THREAT_DB = {
+            "185.220.101.25": { threat_type: "Tor Exit Node / Botnet", severity: "Critical", source: "AlienVault OTX" },
+            "45.33.32.156": { threat_type: "Port Scanner", severity: "High", source: "Internal Honeypot" },
+            "103.21.244.0": { threat_type: "Phishing Host", severity: "Medium", source: "AbuseIPDB" },
+            "192.168.1.10": { threat_type: "Suspicious Activity", severity: "Low", source: "Internal SOC" }
+        };
+
+        const CAPACITY = 10007;
+        const GOLDEN_RATIO = 2654435761;
+        let step = 0;
+        let timer = null;
+        let paused = false;
+
+        function selectPreset(ip) {
+            document.getElementById('ipInput').value = ip;
+            startExecution();
+        }
+
+        function resetState() {
+            if (timer) clearInterval(timer);
+            step = 0;
+            paused = false;
+            document.getElementById('btnPause').innerText = "PAUSE";
+            document.getElementById('stageLabel').innerText = "IDLE";
+            document.getElementById('stepCounter').innerText = "STEP 0/5";
+
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`log-${i}`).classList.remove('active');
+                document.getElementById(`block-${i}`).classList.remove('active');
+            }
+        }
+
+        function togglePause() {
+            if (paused) {
+                paused = false;
+                document.getElementById('btnPause').innerText = "PAUSE";
+                runNextStep();
+            } else {
+                paused = true;
+                if (timer) clearInterval(timer);
+                document.getElementById('btnPause').innerText = "RESUME";
+            }
+        }
+
+        function startExecution() {
+            resetState();
+            document.getElementById('stageLabel').innerText = "RUNNING";
+            runNextStep();
+        }
+
+        function runNextStep() {
+            if (paused) return;
+            step++;
+            if (step > 5) {
+                document.getElementById('stageLabel').innerText = "COMPLETE";
+                return;
+            }
+
+            document.getElementById('stepCounter').innerText = `STEP ${step}/5`;
+
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`log-${i}`).classList.toggle('active', i === step);
+                document.getElementById(`block-${i}`).classList.toggle('active', i <= step);
+            }
+
+            const ip = document.getElementById('ipInput').value.trim();
+            const octets = ip.split('.').map(x => parseInt(x, 10));
+            const ipInt = (octets[0] * 16777216) + (octets[1] * 65536) + (octets[2] * 256) + octets[3];
+            const hash32 = Math.imul(ipInt, GOLDEN_RATIO) >>> 0;
+            const idx = hash32 % CAPACITY;
+            const rec = THREAT_DB[ip] || null;
+
+            if (step === 1) {
+                document.getElementById('disp-octets').innerHTML = `Octet 1: ${octets[0]}  |  Octet 2: ${octets[1]}  |  Octet 3: ${octets[2]}  |  Octet 4: ${octets[3]}`;
+            } else if (step === 2) {
+                document.getElementById('disp-int').innerHTML = `Integer = (${octets[0]} × 256³) + (${octets[1]} × 256²) + (${octets[2]} × 256) + ${octets[3]}\nResult  = ${ipInt.toLocaleString()} (Hex: 0x${ipInt.toString(16).toUpperCase()})`;
+            } else if (step === 3) {
+                document.getElementById('disp-hash').innerHTML = `Hash32Bit = (${ipInt} × 2654435761) mod 2³² = ${hash32}\nBucket Index = ${hash32} mod 10007 = #${idx}`;
+            } else if (step === 4) {
+                document.getElementById('disp-buckets').innerHTML = `
+                    <div class="bucket-slot">#0</div>
+                    <div class="bucket-slot">...</div>
+                    <div class="bucket-slot target">TARGET #${idx}</div>
+                    <div class="bucket-slot">...</div>
+                    <div class="bucket-slot">#10006</div>
+                `;
+                document.getElementById('disp-nodes').innerHTML = `
+                    <span style="color:var(--accent-highlight)">Table[${idx}]</span>
+                    <span class="ptr-arrow">➔</span>
+                    <div class="node-box">
+                        <div class="node-data">Node 0: ${ip} ${rec ? '[MATCH FOUND]' : ''}</div>
+                        <div class="node-ptr">next</div>
+                    </div>
+                    <span class="ptr-arrow">➔</span>
+                    <span>NULL</span>
+                `;
+            } else if (step === 5) {
+                document.getElementById('disp-result').innerHTML = `
+                    <div class="result-box ${rec ? 'malicious' : 'clean'}">
+                        STATUS: ${rec ? 'MALICIOUS THREAT DETECTED' : 'CLEAN IP'}
+                        ${rec ? `<br>Type: ${rec.threat_type} | Severity: ${rec.severity} | Source: ${rec.source}` : ''}
+                    </div>
+                    <table>
+                        <tr><th>Metric</th><th>Hash Table (O(1))</th><th>Linear Search (O(n))</th></tr>
+                        <tr><td>Key Comparisons</td><td>1 comparison</td><td>4,892 comparisons</td></tr>
+                        <tr><td>Execution Time</td><td>0.90 µs</td><td>148.00 µs</td></tr>
+                    </table>
+                `;
+            }
+
+            timer = setTimeout(runNextStep, 1100);
+        }
+
+        window.onload = function () {
+            startExecution();
+        };
+    </script>
+</body>
+
+</html>
